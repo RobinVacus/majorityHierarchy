@@ -171,7 +171,7 @@ public class Main {
 	        	
 	        }
 	        
-	        Main.log("Results stored in '"+filename+"'\n End of computations.");
+	        Main.log("Results stored in '"+filename+"'\nEnd of computations.");
 	        bufferedWriter.close();
 		}
 		catch (Exception e) {
