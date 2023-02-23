@@ -44,8 +44,7 @@ public class SinkMC {
 	
 	public BigFraction[] expectedSinkTime() {
 		
-		System.out.println("Starting computation of expected convergence times.");
-		System.out.println("Size of the matrix: "+n+"x"+transition[0].length+"\n");
+		
 		
 		BigFraction[][] coeffs = new BigFraction[n-1][n-1];
 		
@@ -67,11 +66,16 @@ public class SinkMC {
 		FieldMatrix<BigFraction> matrix = MatrixUtils.createFieldMatrix(coeffs);
 		FieldVector<BigFraction> constants = MatrixUtils.createFieldVector(pi);
 		
-		FieldLUDecomposition<BigFraction> luDecomposition = new FieldLUDecomposition<BigFraction>(matrix);
+		System.out.println("Starting computation of expected convergence times.");
+		System.out.println("Size of the matrix: "+n+"x"+transition[0].length+"\n");
+		
+		FieldLUDecomposition<BigFraction> luDecomposition = new FieldLUDecomposition<BigFraction>(matrix,true);
 		
 		Main.log("LU Decomposition computed");
 		
 		FieldDecompositionSolver<BigFraction> solver = luDecomposition.getSolver();
+		
+		Main.log("Solver initialized");
 		
 		FieldVector<BigFraction> solution = solver.solve(constants);
 		
