@@ -194,21 +194,28 @@ public class Main {
 		
 	}
 	
+	public static void compare(Result r1, Result r2) {
+		
+		for (int i=0 ; i<r1.convergenceTimes.length; i++) {
+			
+			if (r1.convergenceTimes[i].compareTo(r2.convergenceTimes[i]) < 0) {
+				System.out.println("Collapse for nAgents = "+r1.nAgents+" on configuration "+r1.configurationString(i));
+				System.out.println("h = 3: "+r1.convergenceTimes[i].doubleValue());
+				System.out.println("h = 4: "+r2.convergenceTimes[i].doubleValue());
+				System.out.println();
+			}
+			
+		}
+		
+		
+	}
+	
 	public static void lookForCollapse(int nAgents) {
 		
 		Result result3 = get(nAgents,3,3);
 		Result result4 = get(nAgents,3,4);
 		
-		for (int i=0 ; i<result3.convergenceTimes.length; i++) {
-			
-			if (result3.convergenceTimes[i].compareTo(result4.convergenceTimes[i]) < 0) {
-				System.out.println("Collapse for nAgents = "+nAgents+" on configuration "+result3.configurationString(i));
-				System.out.println("h = 3: "+result3.convergenceTimes[i].doubleValue());
-				System.out.println("h = 4: "+result4.convergenceTimes[i].doubleValue());
-				return;
-			}
-			
-		}
+		compare(result3,result4);
 		
 		System.out.println("No collapse for nAgents = "+nAgents);
 		
@@ -227,19 +234,37 @@ public class Main {
 		
 		//lookingForCollapse(35);
 		
-		
-		
-		if (args.length != 3) {
-			System.out.println("Usage: java Main <number of agents> <number of opinions> <sample size>");
-			return;
+		if (args[0].equals("--search")) {
+			
+			if (args.length != 3) {
+				System.out.println("Usage: java Main --search <min number of agents> <max number of agents>");
+				return;
+			}
+			
+			int nAgentsMin = Integer.valueOf(args[1]);
+			int nAgentsMax = Integer.valueOf(args[2]);
+			
+			for (int nAgents = nAgentsMin ; nAgents <= nAgentsMax ; nAgents++) {
+				lookForCollapse(nAgents);
+			}
 		}
 		
-		int nAgentsMin = Integer.valueOf(args[0]);
-		int nAgentsMax = Integer.valueOf(args[1]);
-		
-		for (int nAgents = nAgentsMin ; nAgents <= nAgentsMax ; nAgents++) {
-			lookForCollapse(nAgents);
+		if (args[0].equals("--get")) {
+			
+			if (args.length != 4) {
+				System.out.println("Usage: java Main --get <number of agents> <number of opinions> <sample size>");
+				return;
+			}
+			
+			int nAgents = Integer.valueOf(args[1]);
+			int nOpinions = Integer.valueOf(args[2]);
+			int h = Integer.valueOf(args[3]);
+			
+			System.out.println(get(nAgents,nOpinions,h));
+			
 		}
+		
+		
 
 		//saveToFile(nAgents,nOpinions,h);
 		

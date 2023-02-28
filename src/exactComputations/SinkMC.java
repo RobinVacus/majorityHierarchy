@@ -85,17 +85,14 @@ public class SinkMC {
 		FieldMatrix<BigFraction> matrix = MatrixUtils.createFieldMatrix(coeffs);
 		FieldVector<BigFraction> constants = MatrixUtils.createFieldVector(pi);
 		
-		System.out.println("Starting computation of expected convergence times.");
-		System.out.println("Size of the matrix: "+n+"x"+transition[0].length+"\n");
+		System.out.println("Starting computation of expected convergence times. Size of the matrix: "+n+"x"+transition[0].length+"\n");
 		
 		FieldLUDecomposition<BigFraction> luDecomposition = new FieldLUDecomposition<BigFraction>(matrix,true);
 		
 		Main.log("LU Decomposition computed");
 		
 		FieldDecompositionSolver<BigFraction> solver = luDecomposition.getSolver();
-		
-		Main.log("Solver initialized");
-		
+				
 		FieldVector<BigFraction> solution = solver.solve(constants);
 		
 		Main.log("Convergence times computed");
