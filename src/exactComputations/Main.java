@@ -1,7 +1,12 @@
 package exactComputations;
 
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import org.apache.commons.math3.fraction.*;
 
@@ -68,59 +73,7 @@ public class Main {
 			System.out.println(s+" Mult. coef.:"+s.getMultinomialCoefficient());
 		}
 	}
-	
-	
-	public static boolean compareMajority(int nAgents, int nOpinions, int h1, int h2) {
-		
-		boolean collapse = false;
-		
-		GossipExecution execution1 = new GossipExecution(nAgents,nOpinions,new MajorityTransitionFunction(h1));
-		GossipExecution execution2 = new GossipExecution(nAgents,nOpinions,new MajorityTransitionFunction(h2));
-		
-		Configuration[] configurations = Configuration.allConfigurations(nAgents,nOpinions);
-		BigFraction[] times1 = execution1.getConvergenceTimes();
-		BigFraction[] times2 = execution2.getConvergenceTimes();
-		
-		for (int i=0 ; i<configurations.length ; i++) {
-			
-			System.out.println(configurations[i]);
-			
-			if (i == 0) {
-				System.out.println(0);
-				System.out.println(0);
-			} else {
-				System.out.println(times1[i-1].doubleValue());
-				System.out.println(times2[i-1].doubleValue());
-				if (times1[i-1].compareTo(times2[i-1]) < 0) {
-					System.out.println("Here, the hierarchy collapses...");
-					collapse = true;
-				}
-			}
-			
-			System.out.println();
-			
-		}
-		
-		return collapse;
-		
-	}
-	
-	public static void lookingForCollapse(int iStart, int iEnd) {
-		
-		for (int i=iStart ; i<=iEnd ; i++) {
-			if (compareMajority(i,3,3,4)) {
-				System.out.println("The hierarchy collapsed for n = "+i);
-				break;
-			}
-		}
-		
-	}
-	
-	public static void lookingForCollapse(int i) {
-		
-		lookingForCollapse(i,i);
-		
-	}
+
 	
 	public static void saveToFile(int nAgents, int nOpinions, int h) {
 		
@@ -136,7 +89,7 @@ public class Main {
 	        GossipExecution execution = new GossipExecution(nAgents,nOpinions,new MajorityTransitionFunction(h));
 	        
 	        bufferedWriter.write("Gossip model, "+h+"-majority, "+nAgents+" agents, "+nOpinions+" opinions\n\n");
-	        
+	        /*
 	        for (int i=0 ; i<execution.nConfs ; i++) {
 	        	
 	        	bufferedWriter.write("Configuration "+execution.configurations[i].toString()+"\n");
@@ -159,8 +112,11 @@ public class Main {
 	        	}
 	        }
 	        
-	        BigFraction[] times = execution.getConvergenceTimes();
+	        
 	        bufferedWriter.write("Exact expected convergence times from each configuration:\n\n");
+	        */
+	        
+	        BigFraction[] times = execution.getConvergenceTimes();
 	        for (int i=0 ; i<execution.nConfs ; i++) {
 	        	
 	        	BigFraction time = (i == 0) ? BigFraction.ZERO : times[i-1];
@@ -182,7 +138,82 @@ public class Main {
 		
 	}
 
+	
+	public static String filename(int nAgents, int nOpinions, int h) {
+		return "n="+nAgents+"_m="+nOpinions+"_h="+h+".txt";
+	}
 
+	public static Result serialize(int nAgents, int nOpinions, int h) throws IOException {
+		
+		GossipExecution execution = new GossipExecution(nAgents,nOpinions,new MajorityTransitionFunction(h));
+		
+		Result result = execution.compute();
+		
+		FileOutputStream fileOutputStream
+	      = new FileOutputStream(filename(nAgents,nOpinions,h));
+	    ObjectOutputStream objectOutputStream 
+	      = new ObjectOutputStream(fileOutputStream);
+	    objectOutputStream.writeObject(result);
+	    objectOutputStream.flush();
+	    objectOutputStream.close();
+	    
+	    return result;
+		
+	}
+	
+	public static Result deserialize(int nAgents, int nOpinions, int h) throws IOException, ClassNotFoundException {
+		
+		FileInputStream fileInputStream 
+	      = new FileInputStream(filename(nAgents,nOpinions,h));
+	    ObjectInputStream objectInputStream 
+	      = new ObjectInputStream(fileInputStream);
+	    Result result = (Result) objectInputStream.readObject();
+	    objectInputStream.close();
+	    
+	    return result;
+		
+	}
+	
+	public static Result get(int nAgents, int nOpinions, int h) {
+		
+		try {
+			return deserialize(nAgents,nOpinions,h);
+		}
+		catch (IOException e) {
+			try {
+				return serialize(nAgents,nOpinions,h);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+		
+	}
+	
+	public static void lookForCollapse(int nAgents) {
+		
+		Result result3 = get(nAgents,3,3);
+		Result result4 = get(nAgents,3,4);
+		
+		for (int i=0 ; i<result3.convergenceTimes.length; i++) {
+			
+			if (result3.convergenceTimes[i].compareTo(result4.convergenceTimes[i]) < 0) {
+				System.out.println("Collapse for nAgents = "+nAgents+" on configuration "+result3.configurationString(i));
+				System.out.println("h = 3: "+result3.convergenceTimes[i].doubleValue());
+				System.out.println("h = 4: "+result4.convergenceTimes[i].doubleValue());
+				return;
+			}
+			
+		}
+		
+		System.out.println("No collapse for nAgents = "+nAgents);
+		
+	}
+	
 	public static void main(String[] args) {
 		
 		init();
@@ -194,18 +225,23 @@ public class Main {
 		//execution.printTransitions();
 		//execution.printSinkTimes();
 		
-		//lookingForCollapse(56);
+		//lookingForCollapse(35);
+		
+		
 		
 		if (args.length != 3) {
 			System.out.println("Usage: java Main <number of agents> <number of opinions> <sample size>");
 			return;
 		}
 		
-		int nAgents = Integer.valueOf(args[0]);
-		int nOpinions = Integer.valueOf(args[1]);
-		int h = Integer.valueOf(args[2]);
+		int nAgentsMin = Integer.valueOf(args[0]);
+		int nAgentsMax = Integer.valueOf(args[1]);
+		
+		for (int nAgents = nAgentsMin ; nAgents <= nAgentsMax ; nAgents++) {
+			lookForCollapse(nAgents);
+		}
 
-		saveToFile(nAgents,nOpinions,h);
+		//saveToFile(nAgents,nOpinions,h);
 		
 	}
 

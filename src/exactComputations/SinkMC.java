@@ -13,12 +13,15 @@ public class SinkMC {
 	
 	int n;
 	BigFraction[][] transition;
+	Box<double[][]> doubleTransition;
 	
 	public SinkMC(BigFraction[][] transition) {
 		
 		this.n = transition.length;
 		this.transition = transition;
 		checkValidity();
+		
+		doubleTransition = new Box<double[][]>();
 		
 	}
 	
@@ -39,6 +42,22 @@ public class SinkMC {
 				throw new RuntimeException("The probabilities out of node "+i+" add to "+sum+".");
 			}
 		}
+		
+	}
+	
+	public double[][] getDoubleTransitions() {
+		
+		if (!doubleTransition.isEmpty()) return doubleTransition.get();
+		
+		double[][] result = new double[n][n];
+		for (int i=0 ; i<n ; i++) {
+			for (int j=0 ; j<n ; j++) {
+				result[i][j] = transition[i][j].doubleValue();
+			}
+		}
+		
+		doubleTransition.put(result);
+		return result;
 		
 	}
 	
@@ -87,12 +106,12 @@ public class SinkMC {
 	private int randomJump(int i) {
 		
 		double r = Utils.random.nextDouble();
-		double s = transition[i][0].doubleValue();
+		double s = getDoubleTransitions()[i][0];
 		int index = 0;
 		
 		while (s < r) {
 			index++;
-			s += transition[i][index].doubleValue();
+			s += getDoubleTransitions()[i][index];
 		}
 		
 		return index;

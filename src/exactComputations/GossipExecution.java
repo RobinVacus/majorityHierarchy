@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.apache.commons.math3.fraction.BigFraction;
 
 public class GossipExecution {
-	
+
 	int nAgents,nOpinions,nConfs;
 	
 	/** All possible configurations */
@@ -122,12 +122,30 @@ public class GossipExecution {
 		
 	}
 	
+	public double[] getAverageConvergenceTimes(int iterations) {
+		
+		SinkMC mc = new SinkMC(transitions);
+		return mc.averageSinkTime(iterations);
+		
+	}
+	
 	public void printSinkTimes() {
 		
 		BigFraction[] times = getConvergenceTimes();
 		for (int i=0 ; i<nConfs ; i++) {
 			
 			System.out.println(configurations[i]+" "+(i > 0 ? times[i-1].doubleValue() : 0.));
+			
+		}
+		
+	}
+	
+	public void printAverageSinkTimes(int iterations) {
+		
+		double[] times = getAverageConvergenceTimes(iterations);
+		for (int i=0 ; i<nConfs ; i++) {
+			
+			System.out.println(configurations[i]+" "+(i > 0 ? times[i-1] : 0.));
 			
 		}
 		
@@ -161,6 +179,17 @@ public class GossipExecution {
 		return hit/iterations;
 	}
 
+	Result compute() {
+		
+		BigFraction[] tmp = getConvergenceTimes();
+		BigFraction[] times = new BigFraction[configurations.length];
+		for (int i=0 ; i<configurations.length ; i++) {
+			times[i] = (i == 0) ? BigFraction.ZERO : tmp[i-1]; 
+		}
+		return new Result(nAgents,nOpinions,transitionFunction,configurations,times);
+		
+	}
+	
 }
 
 

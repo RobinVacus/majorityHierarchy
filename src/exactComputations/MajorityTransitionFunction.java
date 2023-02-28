@@ -6,6 +6,8 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 public class MajorityTransitionFunction implements TransitionFunction {
 	
+	private static final long serialVersionUID = 1983249457425817320L;
+	
 	int h;
 	
 	public MajorityTransitionFunction(int h) {
