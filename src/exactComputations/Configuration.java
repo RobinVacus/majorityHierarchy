@@ -9,7 +9,7 @@ public class Configuration {
 	
 	public final int n;
 	
-	private int[] repartition;
+	public int[] repartition;
 	
 	private Box<BigFraction> multinomialCoefficient;
 	private Box<BigFraction[]> probabilities;

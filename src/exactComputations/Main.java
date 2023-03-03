@@ -13,17 +13,22 @@ import org.apache.commons.math3.fraction.*;
 public class Main {
 	
 	public static long lastStep;
-	
-	public static void init() {
-		lastStep = System.currentTimeMillis();
-	}
+	public static boolean firstLog = true;
 	
 	public static void log(String s) {
+		
+		System.out.println(s);
+		
+		if (firstLog) {
+			firstLog = false;
+			System.out.println();
+			lastStep = System.currentTimeMillis();
+			return;
+		}
 		
 		long newStep = System.currentTimeMillis();
 		long difference = newStep - lastStep;
 		
-		System.out.println(s);
 		System.out.println( (((double) difference)/1000) +"s");
 		System.out.println();
 		
@@ -221,10 +226,8 @@ public class Main {
 		
 	}
 	
-	public static void main(String[] args) {
-		
-		init();
-		
+	public static void main(String[] args) throws IOException {
+				
 		//testSinkTime();
 		//testCombinatorics();
 		
@@ -260,7 +263,7 @@ public class Main {
 			int nOpinions = Integer.valueOf(args[2]);
 			int h = Integer.valueOf(args[3]);
 			
-			System.out.println(get(nAgents,nOpinions,h));
+			System.out.println(serialize(nAgents,nOpinions,h));
 			
 		}
 		

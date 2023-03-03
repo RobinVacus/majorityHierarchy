@@ -106,7 +106,7 @@ public class FieldLUDecomposition<T extends FieldElement<T>> {
         for (int col = 0; col < m; col++) {
         
         	if (log) {
-        		System.out.println("Processing column "+col+" / "+m);
+        		System.out.println("Processing column "+(col+1)+" / "+m);
         	}
 
             T sum = field.getZero();

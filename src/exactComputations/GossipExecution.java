@@ -65,6 +65,8 @@ public class GossipExecution {
 		BigFraction sum = BigFraction.ZERO;
 		for (Configuration possibleConfig : c2.getSimilarConfigurations()) {
 			
+			//System.out.println(possibleConfig);
+			
 			BigFraction product = BigFraction.ONE;
 			for (int k=0 ; k<nOpinions ; k++) {
 				
@@ -86,6 +88,7 @@ public class GossipExecution {
 		
 		//Main.log("result: "+result+"\n");
 		
+		//System.out.println(configurations[i]+" -> "+c2+" : "+result.doubleValue());
 		return result;
 	}
 	
